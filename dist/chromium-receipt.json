@@ -1,0 +1,55 @@
+{
+  "version": "1.0.0",
+  "browser": "chromium",
+  "files": [
+    {
+      "path": "background.js",
+      "bytes": 10825,
+      "sha256": "4aa3a46ff668b6e1ccc2b2662e5ab0195c6cbfa8ecb16c46073d5ce73b005d53"
+    },
+    {
+      "path": "transcript-button.js",
+      "bytes": 7046,
+      "sha256": "1e8d2146f142c25d6c63d1f0099242e04a62457cd307871dc46f440d5df00f49"
+    },
+    {
+      "path": "manifest.json",
+      "bytes": 839,
+      "sha256": "a35cc17a3857f5780f6925f1bd7f2806102a4f9e765b67aa43d63c80e21d02f2"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 1079,
+      "sha256": "c1b8beb50d316c998c6944457f9fb7c1bafca227fcdf145793891583bc2bac4a"
+    },
+    {
+      "path": "INSTALL.md",
+      "bytes": 354,
+      "sha256": "01936272b536adbc5b605f717a050ceb229563ca43c133ee7493e5dbf7f43e2d"
+    },
+    {
+      "path": "icons/icon-16.png",
+      "bytes": 541,
+      "sha256": "45084b6bdcad0db9dcb16132780dae9c06c5747bc871b1348c075de5f5037375"
+    },
+    {
+      "path": "icons/icon-32.png",
+      "bytes": 831,
+      "sha256": "0bb295e6dc93b6f548470b650bc8a08b8efd81d69d5fe9b71563f422db3282c5"
+    },
+    {
+      "path": "icons/icon-48.png",
+      "bytes": 1315,
+      "sha256": "5e4ca10479c28c1972a0a13cc0231de08c062c8f6ab09732aa5e7ce8c213169d"
+    },
+    {
+      "path": "icons/icon-128.png",
+      "bytes": 2913,
+      "sha256": "04496fdaa0507cdb6ac993e5c76d24129b69182b5a0fc9084d07edcf9d3d9e38"
+    }
+  ],
+  "archive": {
+    "path": "transcopy-chromium-1.0.0.zip",
+    "sha256": "501863a362fc3b2bcc190db513029d21faa383ced421b4a6d1d0889a27c1afbb"
+  }
+}

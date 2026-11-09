@@ -1,0 +1,9 @@
+# Security
+
+Report security problems through the repository's private vulnerability-reporting option if available. If it is unavailable, contact the repository owner privately; do not post credentials, private video links, transcripts or personal browser data in a public issue.
+
+Do not disable browser protections to install this project. Developer packages are not store-signed releases. Inspect the source and permissions before loading them.
+
+The background process accepts only its own extension's transcript messages, binds retrieval to the originating YouTube tab and video, and rejects unrelated actions. It cannot call JotStudio's helper or Studio insertion interfaces. Caption requests are restricted to YouTube timed-text URLs and do not request translated tracks.
+
+YouTube page scripts can observe or interfere with MAIN-world retrieval. The extension uses that context only to read the page's own player/caption data; no provider secrets or privileged helper credentials enter it. Video identity is rechecked before returning text. Like any client tool, this cannot guarantee the truth of text provided by a compromised website.

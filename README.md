@@ -8,9 +8,8 @@ No AI calls. No API keys. No sign-in service. No local app or server.
 
 ## Download
 
-- [Chromium package · v1.0.0](dist/transcopy-chromium-1.0.0.zip) — Chrome, Edge, Brave and other compatible desktop Chromium browsers.
-- [Firefox developer package · v1.0.0](dist/transcopy-firefox-1.0.0.zip) — temporary developer installation; Mozilla signing is still required for permanent installation.
-- [Source code](https://github.com/berkant-jotform/transcopy/archive/refs/heads/main.zip)
+- [Chromium package · v1.0.1](dist/transcopy-chromium-1.0.1.zip) — Chrome, Edge, Brave and other compatible desktop Chromium browsers.
+- [Firefox developer package · v1.0.1](dist/transcopy-firefox-1.0.1.zip) — temporary developer installation; Mozilla signing is still required for permanent installation.
 
 **Release status:** Developer packages, not browser-store releases. The source is OS independent; Windows, macOS and Linux do not need a helper app. Chromium package builds and automated tests pass. Firefox has a separate manifest and build verification; live Firefox acceptance and Mozilla signing are pending. Safari and mobile browsers are not supported by this release.
 
@@ -21,7 +20,7 @@ No AI calls. No API keys. No sign-in service. No local app or server.
 3. Enable **Developer mode**, choose **Load unpacked**, then select the extracted folder containing `manifest.json`.
 4. Open or refresh a YouTube video or Short.
 
-No Terminal commands, Mac app, hosted service or JotStudio installation are needed.
+No command-line setup or hosted service is needed.
 
 ## Use it
 
@@ -80,7 +79,7 @@ The only extension API permission is **scripting**, with site access limited to 
 
 ## Troubleshooting
 
-**No button:** refresh YouTube after installation/reload, confirm site access is enabled, and use a regular `www.youtube.com/watch` or `/shorts/` page. Avoid running both this and another copy of the same JotStudio copier at once.
+**No button:** refresh YouTube after installation/reload, confirm site access is enabled, and use a regular `www.youtube.com/watch` or `/shorts/` page. If another transcript-copy extension is installed, disable one to avoid duplicate buttons.
 
 **Clipboard blocked:** the fetched transcript is held in memory. Click **Copy again** to copy it without retrieving it again.
 
@@ -106,6 +105,6 @@ Build outputs are under `dist/chromium` and `dist/firefox`, with deterministic Z
 
 ## Scope
 
-This standalone release contains only the transcript-copy feature. It does not contain the JotStudio app, AI/subtitle preparation, Studio insertion, credentials, job data or private colleague-created tools. It is not affiliated with YouTube or Google.
+Transcopy reads and copies existing YouTube captions. It does not alter videos, publish content, or transcribe audio. It is not affiliated with YouTube or Google.
 
 MIT licensed. See [LICENSE](LICENSE).

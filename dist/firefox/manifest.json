@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Transcopy",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Copy timestamped transcripts directly from YouTube videos and Shorts. No AI, accounts or backend.",
   "permissions": [
     "scripting"
@@ -36,7 +36,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "transcopy@berkant-jotform.github.io",
+      "id": "{c4effc9a-75e6-4aa7-bf83-ab81046b8bd8}",
       "strict_min_version": "140.0",
       "data_collection_permissions": {
         "required": [

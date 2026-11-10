@@ -72,7 +72,7 @@ it('binds the copy to the tab and video and refuses navigation during retrieval'
   chromeTab();await expect(scrapeActiveWatchTranscript()).resolves.toMatchObject({text:formatTranscript(snapshot,id).text});
   chromeTab(`https://www.youtube.com/watch?v=${other}`);await expect(scrapeWatchTranscript(8,id)).rejects.toThrow('video changed');
 });
-it('does not open tabs, call the helper, or start AI when copying from an existing watch page',async()=>{
+it('copies from an existing watch page without opening tabs or making extension-side network requests',async()=>{
   const mocks=chromeTab();const fetcher=vi.fn();vi.stubGlobal('fetch',fetcher);
   await scrapeActiveWatchTranscript(id,8);expect(mocks.executeScript).toHaveBeenCalledTimes(1);expect(fetcher).not.toHaveBeenCalled();expect('create' in chrome.tabs).toBe(false);
 });

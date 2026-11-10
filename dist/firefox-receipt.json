@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "browser": "firefox",
   "files": [
     {
@@ -14,8 +14,8 @@
     },
     {
       "path": "manifest.json",
-      "bytes": 1054,
-      "sha256": "70aa81e437f324e151579ea7f766ad04e0024021bc74a54eb7fc489bbea0ceca"
+      "bytes": 1057,
+      "sha256": "8f89d213459a843cba65484957bed062233ab08767d34da779a0e7b1c40c99bf"
     },
     {
       "path": "LICENSE",
@@ -24,8 +24,8 @@
     },
     {
       "path": "INSTALL.md",
-      "bytes": 391,
-      "sha256": "87ca838853b7a0484a3bd96f940823233704eae9f09fa213753cc0eec1e3dff2"
+      "bytes": 339,
+      "sha256": "db507a1b7e1940d156a0994849ba964cfb76806d3eedaa42b6adfd5326c96b3b"
     },
     {
       "path": "icons/icon-16.png",
@@ -49,7 +49,7 @@
     }
   ],
   "archive": {
-    "path": "transcopy-firefox-1.0.0.zip",
-    "sha256": "88cc90eb3db3775db1c0758c3217c3b9f3dce1465791b75a541efbe52a865bb3"
+    "path": "transcopy-firefox-1.0.1.zip",
+    "sha256": "4d84adf67ac26ae702aab74516694e948dbdcc8467ee3999f6dd84503b959f82"
   }
 }

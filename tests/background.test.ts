@@ -14,7 +14,7 @@ it('rejects other origins, extensions and malformed video identifiers',async()=>
  for(const sender of [{id:'other',tab:{id:8,url:'https://www.youtube.com/watch?v=abcdefghijk'}},{id:'standalone',tab:{id:8,url:'https://example.com/'}}])expect((await send({type:'TRANSCRIPT_COPY'},sender)).error).toBeTruthy();
  expect((await send({type:'TRANSCRIPT_COPY',videoId:'not a video'},{id:'standalone'})).error).toBeTruthy();expect(scrape).not.toHaveBeenCalled();
 });
-it('ignores unrelated actions without enabling helper or insertion functionality',()=>{
- for(const type of ['FLOW_API','FLOW_APPLY','PUBLISHING_INSERT'])expect(handler({type},{id:'standalone'},vi.fn())).toBe(false);
+it('ignores every unrelated message type',()=>{
+ for(const type of ['DELETE_VIDEO','UPLOAD_MEDIA','UNSUPPORTED_OPERATION'])expect(handler({type},{id:'standalone'},vi.fn())).toBe(false);
  expect(scrape).not.toHaveBeenCalled();
 });

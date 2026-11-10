@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "browser": "chromium",
   "files": [
     {
@@ -15,7 +15,7 @@
     {
       "path": "manifest.json",
       "bytes": 839,
-      "sha256": "a35cc17a3857f5780f6925f1bd7f2806102a4f9e765b67aa43d63c80e21d02f2"
+      "sha256": "7727d6b2900780e7d322e5a83bb09c482f02c7c28811a74b8259312174bc31f7"
     },
     {
       "path": "LICENSE",
@@ -24,8 +24,8 @@
     },
     {
       "path": "INSTALL.md",
-      "bytes": 354,
-      "sha256": "01936272b536adbc5b605f717a050ceb229563ca43c133ee7493e5dbf7f43e2d"
+      "bytes": 302,
+      "sha256": "64a653b9094488683a970bf0f95862cb0bb7408a56b86e177b41c13b64f9f17d"
     },
     {
       "path": "icons/icon-16.png",
@@ -49,7 +49,7 @@
     }
   ],
   "archive": {
-    "path": "transcopy-chromium-1.0.0.zip",
-    "sha256": "501863a362fc3b2bcc190db513029d21faa383ced421b4a6d1d0889a27c1afbb"
+    "path": "transcopy-chromium-1.0.1.zip",
+    "sha256": "288985cdc5123d6f00b822f38ee28bc50efd6aeb1492dd2e5bd7f86796edd95a"
   }
 }

@@ -2,9 +2,9 @@ import {afterEach,expect,it,vi} from 'vitest';
 const id='abcdefghijk',other='123456789ab',url=`https://www.youtube.com/shorts/${id}`;
 const data={videoId:id,title:'A Short',text:'[00:00] Hello.',cueCount:1};
 class Node {
- children:Node[]=[];attrs:Record<string,string>={};dataset:Record<string,string>={};events:Record<string,(event:any)=>void>={};parentElement:Node|null=null;isConnected=true;disabled=false;title='';type='';className='';id='';shadow:Node|null=null;private text='';
+ children:Node[]=[];attrs:Record<string,string>={};dataset:Record<string,string>={};events:Record<string,(event:any)=>void>={};parentElement:Node|null=null;style={setProperty:vi.fn()};focus=vi.fn();dispatchEvent(event:Event){this.events[event.type]?.(event);}isConnected=true;disabled=false;title='';type='';className='';id='';shadow:Node|null=null;private text='';
  get textContent(){return this.text;}set textContent(value:string){this.text=value;this.children=[];}
- getBoundingClientRect(){return {width:40,height:48,top:100,bottom:148};}
+ getBoundingClientRect(){return {width:40,height:48,left:740,right:780,top:100,bottom:148};}
  append(...nodes:Node[]){for(const node of nodes){node.parentElement=this;this.children.push(node);}}
  attachShadow(){return this.shadow=new Node();}setAttribute(key:string,value:string){this.attrs[key]=value;}
  addEventListener(key:string,value:(event:any)=>void){this.events[key]=value;}remove(){this.isConnected=false;}
@@ -12,7 +12,7 @@ class Node {
 async function setup(){
  vi.useFakeTimers();vi.resetModules();let visible=true,mutation!:(records?:unknown[])=>void;
  const rail=new Node();const doc={querySelectorAll:()=>visible?[rail]:[],querySelector:()=>null,createElement:()=>new Node(),createElementNS:()=>new Node(),addEventListener:vi.fn(),documentElement:new Node()};
- vi.stubGlobal('window',{innerHeight:900,addEventListener:vi.fn()});vi.stubGlobal('document',doc);vi.stubGlobal('location',new URL(url));
+ vi.stubGlobal('window',{innerHeight:900,innerWidth:900,addEventListener:vi.fn()});vi.stubGlobal('document',doc);vi.stubGlobal('location',new URL(url));
  vi.stubGlobal('MutationObserver',class{constructor(fn:typeof mutation){mutation=fn;}observe(){}});
  vi.stubGlobal('ClipboardItem',undefined);const writeText=vi.fn(async()=>{});vi.stubGlobal('navigator',{clipboard:{writeText}});
  const send=vi.fn(async():Promise<any>=>({data}));vi.stubGlobal('chrome',{runtime:{sendMessage:send}});
@@ -51,4 +51,31 @@ it('preserves icon copy formatting through explicit recovery approval',async()=>
  click(env.controls().icon);await vi.advanceTimersByTimeAsync(0);click(env.controls().notice.children[0]);await vi.advanceTimersByTimeAsync(0);
  expect(env.send).toHaveBeenLastCalledWith({type:'TRANSCRIPT_COPY',videoId:id,approvedTemporary:true});
  expect(env.writeText).toHaveBeenLastCalledWith(`A Short\nhttps://www.youtube.com/watch?v=${id}\n\n[00:00] Hello.`);
+});
+
+it('makes errors dismissible without losing the saved clipboard retry',async()=>{
+ const env=await setup();env.writeText.mockRejectedValueOnce(new Error('denied'));
+ click(env.controls().text);await vi.advanceTimersByTimeAsync(0);
+ const {notice,group,text}=env.controls();expect(group.dataset.copyState).toBe('error');
+ const close=notice.children.find(node=>node.className==='dismiss')!;expect(close.attrs['aria-label']).toBe('Dismiss message');
+ click(close);expect(notice.textContent).toBe('');expect(text.textContent).toBe('Copy transcript');expect(text.focus).toHaveBeenCalled();
+ click(text);await vi.advanceTimersByTimeAsync(0);expect(env.send).toHaveBeenCalledTimes(1);expect(text.textContent).toBe('Copied!');
+});
+it('shows a copying stage while the clipboard is still writing',async()=>{
+ const env=await setup();let finish!:()=>void;env.writeText.mockImplementationOnce(()=>new Promise<void>(resolve=>{finish=resolve;}));
+ click(env.controls().text);await vi.advanceTimersByTimeAsync(0);
+ expect(env.controls().text.textContent).toBe('Copying…');expect(env.controls().text.disabled).toBe(true);
+ finish();await vi.advanceTimersByTimeAsync(0);expect(env.controls().notice.textContent).toBe('1 timestamped line copied.');
+});
+it('keeps Shorts feedback within the viewport and refits without invalidating a request',async()=>{
+ const env=await setup();const {host}=env.controls();expect(host.style.setProperty).toHaveBeenCalledWith('--control-left','-8px');
+ expect(env.controls().notice.style.setProperty).toHaveBeenCalledWith('--notice-left','-102px');
+ let finish!:(v:any)=>void;env.send.mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve;}));
+ click(env.controls().text);env.visibility(true);await vi.advanceTimersByTimeAsync(300);
+ expect(env.controls().host).toBe(host);finish({data});await vi.advanceTimersByTimeAsync(0);expect(env.controls().text.textContent).toBe('Copied!');
+});
+it('Escape dismisses completed messages but does not hide an ongoing copy',async()=>{
+ const env=await setup();const {host,text,notice}=env.controls();const event={key:'Escape',stopPropagation:vi.fn()};
+ click(text);host.shadow!.events.keydown(event);expect(text.textContent).toBe('Reading…');
+ await vi.advanceTimersByTimeAsync(0);host.shadow!.events.keydown(event);expect(notice.textContent).toBe('');expect(text.textContent).toBe('Copy transcript');
 });

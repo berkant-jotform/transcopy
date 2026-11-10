@@ -1,5 +1,5 @@
 import {extensionApi} from '../lib/browser-api';
-import {copyTranscriptFromClick,watchVideoId,type CopiedTranscript} from '../lib/transcript-copy';
+import {copyTranscriptFromClick,transcriptCopyError,watchVideoId,type CopiedTranscript} from '../lib/transcript-copy';
 
 let host:HTMLElement|null=null,output:HTMLElement|null=null;
 let currentId:string|null=null,cached:CopiedTranscript|null=null,inFlight=false,scheduled=false,epoch=0,lastUrl='';
@@ -27,19 +27,55 @@ function mount() {
   if(!id||(!shorts&&location.pathname!=='/watch')){if(host)discardControl();return;}
   const target=transcriptButtonTarget(document,shorts);
   if(!target){if(host)discardControl();return;}
-  if(host?.isConnected&&host.parentElement===target)return;
+  if(host?.isConnected&&host.parentElement===target){host.dispatchEvent(new Event('transcopy-fit'));return;}
   // Shorts recycle their action rails. Invalidate an old mounted control before moving.
   if(host)discardControl();
   host=document.createElement('span');host.id='transcopy';host.dataset.build=extensionApi().runtime.getManifest?.()?.version||'unknown';
   const shadow=host.attachShadow({mode:'open'}),style=document.createElement('style');
-  style.textContent=`:host{display:inline-flex;position:relative;align-items:center;margin-left:8px;flex-shrink:0;font:500 14px Roboto,Arial,sans-serif}:host([data-shorts]){margin:0;width:0;height:40px;flex:0 0 0;align-self:center;z-index:2100}:host([data-shorts]) .split{position:absolute;left:10px;top:0}.split{display:inline-flex;align-items:stretch;border-radius:22px;border:1px solid #a99ade66;background:var(--yt-spec-badge-chip-background,#27252f);overflow:hidden}button{font:inherit;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;border:0;background:transparent;color:var(--yt-spec-text-primary,#eee);padding:0 11px;height:36px;cursor:pointer}.with-source{width:34px;padding:0;border-right:1px solid #a99ade44;flex-shrink:0}.plain{padding-left:9px}button:hover{background:#8271bb33}button:focus-visible{outline:2px solid #b4a1ff;outline-offset:-3px}button:disabled{cursor:progress;opacity:.7}svg{width:18px;height:18px;color:#b5a1ff}output{position:absolute;top:calc(100% + 7px);right:0;width:230px;max-width:80vw;padding:10px 12px;border-radius:12px;background:#22202e;color:#eee;border:1px solid #8e7dbc77;font:12px/1.5 Roboto,Arial,sans-serif;box-shadow:0 4px 14px #0003;z-index:2100}:host([data-shorts]) output{left:10px;right:auto;top:auto;bottom:calc(100% + 7px)}output .recover{display:block;white-space:normal;height:auto;min-height:36px;margin-top:8px;padding:8px 10px;background:#8271bb44;border-radius:8px;text-align:left}output:empty{display:none}.split[data-copy-state=success]{border-color:#75d8ba}`;
+  style.textContent=`
+:host{display:inline-flex;position:relative;align-items:center;margin-left:8px;flex-shrink:0;font:500 14px Roboto,Arial,sans-serif;color-scheme:light dark}
+:host([data-shorts]){margin:0;width:0;height:40px;flex:0 0 0;align-self:center;z-index:2100}
+:host([data-shorts]) .split{position:absolute;left:var(--control-left,10px);top:0}
+.split{display:inline-flex;align-items:stretch;border-radius:22px;border:1px solid #a99ade66;background:var(--yt-spec-badge-chip-background,#27252f);overflow:hidden;transition:border-color .16s,box-shadow .16s}
+button{font:inherit;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;border:0;background:transparent;color:var(--yt-spec-text-primary,#eee);padding:0 11px;height:36px;cursor:pointer;touch-action:manipulation}
+.with-source{width:34px;padding:0;border-right:1px solid #a99ade44;flex-shrink:0}.plain{padding-left:9px;min-width:112px;box-sizing:border-box;gap:6px}
+button:hover{background:#8271bb26}button:focus-visible{outline:2px solid #a28be8;outline-offset:-3px}button:disabled{cursor:progress;opacity:.8}
+svg{width:18px;height:18px;color:#a28be8}
+.split[aria-busy=true] .plain:before{content:'';width:11px;height:11px;border:2px solid #a99ade55;border-top-color:#a28be8;border-radius:50%;animation:spin .8s linear infinite}
+.split[data-copy-state=success]{border-color:#53b99b;box-shadow:0 0 0 2px #53b99b18}
+.split[data-copy-state=error]{border-color:#c89b59}
+output{position:absolute;top:calc(100% + 7px);left:var(--notice-left,auto);right:0;width:250px;max-width:calc(100vw - 40px);box-sizing:border-box;padding:12px 34px 12px 12px;border-radius:12px;background:var(--yt-spec-base-background,#22202e);color:var(--yt-spec-text-primary,#eee);border:1px solid #8e7dbc77;font:12px/1.5 Roboto,Arial,sans-serif;box-shadow:0 5px 20px #0003;z-index:2100;overflow-wrap:anywhere}
+:host([data-shorts]) output{left:var(--notice-left,10px);right:auto;top:auto;bottom:calc(100% + 7px)}
+output .recover{display:block;white-space:normal;height:auto;min-height:36px;margin-top:10px;padding:8px 10px;background:#8271bb26;border:1px solid #a99ade55;border-radius:8px;text-align:left;width:100%}
+output .dismiss{position:absolute;right:4px;top:4px;width:26px;height:26px;padding:0;border-radius:50%;font-size:18px;line-height:1}
+output:empty{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.split{transition:none}.split[aria-busy=true] .plain:before{animation:none;border-color:#a28be8}}
+`;
+
   if(shorts)host.dataset.shorts='true';
   const group=document.createElement('span');group.className='split';group.setAttribute('role','group');group.setAttribute('aria-label','Copy transcript');
   const source=document.createElement('button');source.type='button';source.className='with-source';source.title='Copy transcript with video title and link';source.setAttribute('aria-label',source.title);
   const icon=document.createElementNS('http://www.w3.org/2000/svg','svg');icon.setAttribute('viewBox','0 0 24 24');icon.setAttribute('aria-hidden','true');
-  const path=document.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d','M5 4h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-5 3v-3a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1m1 5h12M6 13h5m3 0h4');path.setAttribute('fill','none');path.setAttribute('stroke','currentColor');path.setAttribute('stroke-width','1.7');path.setAttribute('stroke-linecap','round');icon.append(path);source.append(icon);
+  const path=document.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d','M9 7V3h12v14h-4M3 7h14v14H3zM7 12h6m-6 4h6');path.setAttribute('fill','none');path.setAttribute('stroke','currentColor');path.setAttribute('stroke-width','1.7');path.setAttribute('stroke-linecap','round');icon.append(path);source.append(icon);
   const plain=document.createElement('button');plain.type='button';plain.className='plain';plain.title='Copy only the transcript with timestamps';plain.setAttribute('aria-label','Copy transcript with timestamps');plain.textContent='Copy transcript';
-  output=document.createElement('output');output.setAttribute('role','status');
+  output=document.createElement('output');output.setAttribute('role','status');output.setAttribute('aria-live','polite');output.setAttribute('aria-atomic','true');
+  function fit(){
+    const rect=nodeBounds();if(!rect)return;
+    const width=Math.min(250,window.innerWidth-40);
+    output?.style.setProperty('--notice-left',`${Math.max(12-rect.left,Math.min(shorts?10:rect.width-width,window.innerWidth-12-rect.left-width))}px`);
+    if(shorts)host?.style.setProperty('--control-left',`${Math.max(12-rect.left,Math.min(10,window.innerWidth-12-rect.left-156))}px`);
+  }
+  function nodeBounds(){const rect=host?.getBoundingClientRect();return rect&&Number.isFinite(rect.left)&&Number.isFinite(window.innerWidth)?rect:null;}
+  function dismiss(){
+    if(inFlight)return;
+    if(feedbackTimer!==undefined){clearTimeout(feedbackTimer);feedbackTimer=undefined;}
+    output!.textContent='';plain.textContent='Copy transcript';delete group.dataset.copyState;
+  }
+  function addDismiss(){
+    const close=document.createElement('button');close.type='button';close.className='dismiss';close.textContent='×';close.title='Dismiss message';close.setAttribute('aria-label','Dismiss message');
+    close.addEventListener('click',event=>{event.stopPropagation();dismiss();plain.focus();});output!.append(close);fit();
+  }
   function copy(event:MouseEvent,includeSource:boolean,approvedTemporary=false){
     event.stopPropagation();
     const requested=watchVideoId(location.href),token=epoch,notice=output,node=host;
@@ -47,7 +83,7 @@ function mount() {
     if(!requested||inFlight)return;
     if(feedbackTimer!==undefined){clearTimeout(feedbackTimer);feedbackTimer=undefined;}
     delete group.dataset.copyState;group.setAttribute('aria-busy','true');
-    inFlight=true;source.disabled=plain.disabled=true;plain.textContent='Reading…';notice!.textContent='Reading captions from this video…';
+    inFlight=true;source.disabled=plain.disabled=true;plain.textContent='Reading…';notice!.textContent=approvedTemporary?'Reading captions in a temporary tab. It will close when finished…':'Reading captions from this video…';fit();
     const load=async()=>{
       if(cached?.videoId===requested)return cached;
       const response=await extensionApi().runtime.sendMessage({type:'TRANSCRIPT_COPY',videoId:requested,...(approvedTemporary?{approvedTemporary:true}:{})});
@@ -55,23 +91,24 @@ function mount() {
       if(token!==epoch||watchVideoId(location.href)!==requested||response?.data?.videoId!==requested)throw new Error('The video changed. Click Copy transcript again.');
       return response.data as CopiedTranscript;
     };
-    void copyTranscriptFromClick(load,value=>{if(current())cached=value;},includeSource).then(value=>{
+    void copyTranscriptFromClick(load,value=>{if(current()){cached=value;plain.textContent='Copying…';notice!.textContent='Copying the transcript to your clipboard…';}},includeSource).then(value=>{
       if(!current())return;
-      cached=null;plain.textContent='Copied!';group.dataset.copyState='success';notice!.textContent=`${includeSource?'Title, link and ':''}${value.cueCount} timestamped lines copied.`;
+      cached=null;plain.textContent='Copied!';group.dataset.copyState='success';notice!.textContent=`${includeSource?'Title, link and ':''}${value.cueCount} ${value.cueCount===1?'timestamped line':'timestamped lines'} copied.`;addDismiss();
       feedbackTimer=setTimeout(()=>{if(current()){notice!.textContent='';plain.textContent='Copy transcript';delete group.dataset.copyState;}},4000);
     }).catch(error=>{if(current()){
-      plain.textContent=cached?'Copy again':'Try again';notice!.textContent=error instanceof Error?error.message:'This transcript could not be copied.';
+      group.dataset.copyState='error';plain.textContent=cached?'Copy again':'Try again';notice!.textContent=transcriptCopyError(error);
       if((error as {transcriptRecovery?:string})?.transcriptRecovery==='temporary-watch'){
         const approve=document.createElement('button');approve.type='button';approve.textContent='Open temporary tab & copy';approve.className='recover';
         approve.title='Open a background regular-watch tab for this video, read captions, then close that tab';
         approve.addEventListener('click',event=>{event.stopPropagation();if(current())copy(event,includeSource,true);else schedule();});notice!.append(approve);
       }
+      addDismiss();
     }})
       .finally(()=>{if(current()){inFlight=false;source.disabled=plain.disabled=false;group.setAttribute('aria-busy','false');}});
   }
-  group.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' ')event.stopPropagation();});
+  shadow.addEventListener('keydown',raw=>{const event=raw as KeyboardEvent;if(event.key==='Enter'||event.key===' ')event.stopPropagation();if(event.key==='Escape'&&!inFlight){event.stopPropagation();dismiss();plain.focus();}});
   source.addEventListener('click',event=>copy(event,true));plain.addEventListener('click',event=>copy(event,false));
-  group.append(source,plain);shadow.append(style,group,output);target.append(host);
+  group.append(source,plain);shadow.append(style,group,output);target.append(host);host.addEventListener('transcopy-fit',fit);fit();
 }
 function schedule(){if(!scheduled){scheduled=true;setTimeout(mount,250);}}
 document.addEventListener('yt-navigate-finish',schedule);

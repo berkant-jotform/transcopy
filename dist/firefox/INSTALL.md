@@ -1,4 +1,4 @@
-# Transcopy 1.0.1
+# Transcopy 1.0.2
 
 Temporary developer installation: open about:debugging#/runtime/this-firefox, choose Load Temporary Add-on, and select manifest.json. Permanent installation requires Mozilla signing.
 

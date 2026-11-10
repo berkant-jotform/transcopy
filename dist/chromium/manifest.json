@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Transcopy",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Copy timestamped transcripts directly from YouTube videos and Shorts. No AI, accounts or backend.",
   "permissions": [
     "scripting"

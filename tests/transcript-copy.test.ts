@@ -88,3 +88,11 @@ it('collects recycled transcript rows even if the native panel starts at the bot
   expect(formatTranscript(result.snapshot!,id).text).toBe('[00:00] Part 0\n[00:01] Part 1\n[00:02] Part 2\n[00:03] Part 3');
   expect(position).toBe(300);
 });
+
+it('gives an actionable refresh message after an extension reload',async()=>{
+ const {transcriptCopyError}=await import('../lib/transcript-copy');
+ expect(transcriptCopyError(new Error('Extension context invalidated.'))).toContain('Refresh this YouTube page');
+ expect(transcriptCopyError(new Error('Could not establish connection. Receiving end does not exist.'))).toContain('Refresh this YouTube page');
+ expect(transcriptCopyError(new Error('YouTube blocked this caption request.'))).toBe('YouTube blocked this caption request.');
+ expect(transcriptCopyError(null)).toContain('Try again');
+});

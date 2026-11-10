@@ -1,4 +1,4 @@
-# Transcopy 1.0.1
+# Transcopy 1.0.2
 
 Extract this ZIP into a permanent folder. Open your browser Extensions page, enable Developer mode, choose Load unpacked, and select this folder.
 

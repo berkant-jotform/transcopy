@@ -8,8 +8,8 @@ No AI calls. No API keys. No sign-in service. No local app or server.
 
 ## Download
 
-- [Chromium package · v1.0.1](dist/transcopy-chromium-1.0.1.zip) — Chrome, Edge, Brave and other compatible desktop Chromium browsers.
-- [Firefox developer package · v1.0.1](dist/transcopy-firefox-1.0.1.zip) — temporary developer installation; Mozilla signing is still required for permanent installation.
+- [Chromium package · v1.0.2](dist/transcopy-chromium-1.0.2.zip) — Chrome, Edge, Brave and other compatible desktop Chromium browsers.
+- [Firefox developer package · v1.0.2](dist/transcopy-firefox-1.0.2.zip) — temporary developer installation; Mozilla signing is still required for permanent installation.
 
 **Release status:** Developer packages, not browser-store releases. The source is OS independent; Windows, macOS and Linux do not need a helper app. Chromium package builds and automated tests pass. Firefox has a separate manifest and build verification; live Firefox acceptance and Mozilla signing are pending. Safari and mobile browsers are not supported by this release.
 
@@ -29,6 +29,8 @@ The button appears beside the normal video action buttons. In Shorts, it appears
 - Click **Copy transcript** to copy just the timestamped words.
 - Click the **small icon** to copy the video title and canonical link above the transcript.
 - Paste into any editor, chat or document.
+
+The button shows Reading, Copying and Copied feedback. Dismiss a finished message with its × button or Escape. If your browser blocks copying, the retrieved transcript stays available for another click.
 
 Example:
 

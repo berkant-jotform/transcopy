@@ -58,6 +58,14 @@ export async function copyTranscriptFromClick(load: () => Promise<CopiedTranscri
   // Wait for both so a clipboard denial does not discard the retrieved text.
   const [result, copied] = await Promise.allSettled([pending, writing]);
   if (result.status === 'rejected') throw result.reason;
-  if (copied.status === 'rejected') throw new Error('The transcript is ready, but Your browser blocked clipboard access. Click again to copy the saved text.');
+  if (copied.status === 'rejected') throw new Error('The transcript is ready, but your browser blocked clipboard access. Click again to copy the saved text.');
   return result.value;
+}
+
+/** Translate extension lifecycle failures into a next step without hiding caption errors. */
+export function transcriptCopyError(error: unknown): string {
+  const message=error instanceof Error?error.message:'';
+  if (/extension context invalidated|receiving end does not exist|could not establish connection/i.test(message))
+    return 'Transcopy was updated or disconnected. Refresh this YouTube page, then try copying again.';
+  return message || 'The transcript could not be copied. Try again from this video.';
 }
